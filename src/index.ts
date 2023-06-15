@@ -1,0 +1,11 @@
+import { Game } from './game';
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+canvas.style.backgroundColor = '#7f7053';
+canvas.style.position = 'absolute';
+canvas.style.left = '50%';
+canvas.style.top = '50%';
+canvas.style.transform = 'translate(-50%, -50%)';
+canvas.width = 1024;
+canvas.height = 768;
+const game = new Game(canvas);
+game.start();
