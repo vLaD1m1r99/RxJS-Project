@@ -1,11 +1,9 @@
-export class Platform {
-  public position: Vector2;
-  public size: Size;
+export class Finish {
+  position: Vector2;
   image: HTMLImageElement;
 
-  constructor(position: Vector2, size: Size, image: HTMLImageElement) {
+  constructor(position: Vector2, image: HTMLImageElement) {
     this.position = position;
-    this.size = size;
     this.image = image;
   }
 
@@ -14,8 +12,8 @@ export class Platform {
       this.image,
       this.position.x,
       this.position.y,
-      this.size.width,
-      this.size.height
+      this.image.width,
+      this.image.height
     );
   }
 }

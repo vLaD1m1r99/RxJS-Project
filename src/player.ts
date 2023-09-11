@@ -1,22 +1,4 @@
 import { gravity, playerSpeed, playerJump } from './utils';
-type Vector2 = {
-  x: number;
-  y: number;
-};
-type Size = {
-  width: number;
-  height: number;
-};
-type Sprites = {
-  stand: {
-    right: HTMLImageElement;
-    left: HTMLImageElement;
-  };
-  run: {
-    right: HTMLImageElement;
-    left: HTMLImageElement;
-  };
-};
 export class Player {
   public position: Vector2;
   public velocity: Vector2;

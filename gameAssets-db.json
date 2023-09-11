@@ -1,0 +1,19 @@
+{
+  "imageAssets": {
+    "mainMenu": {
+      "background": "mainMenu.jpg",
+      "play": "playButton.png"
+    },
+    "character": {
+      "characterMoveLeft": "charMoveLeft.png",
+      "characterMoveRight": "charMoveRight.png",
+      "characterStandLeft": "charStandLeft.png",
+      "characterStandRight": "charStandRight.png"
+    },
+    "background": "bg.png",
+    "finish": "finish.png",
+    "life": "heart.png",
+    "platform": "platform.png"
+  },
+  "gameAssets": {}
+}

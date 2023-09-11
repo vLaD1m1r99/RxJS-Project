@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "watch": "webpack --watch --config webpack.config.js",
-    "db": "json-server --watch movies-db.json"
+    "db": "json-server --watch gameAssets-db.json"
   },
   "author": "",
   "license": "ISC",

@@ -1,41 +1,55 @@
+import { MainMenu } from './mainMenu';
+import { GameOver } from './gameOver';
+import { YouWon } from './youWon';
 import { Player } from './player';
 import { Platform } from './platform';
+import { Finish } from './finish';
+import { Life } from './life';
 import { fromEvent, merge, from } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { GenericObject } from './genericObject';
 import {
-  createImage,
   genericObjectSpeed,
   platformSpeed,
   playerSpeed,
   winingLength,
 } from './utils';
 
-const platformImage = createImage('./img/platform.png');
-const backgroundImage = createImage('./img/bg.png');
-const finishImage = createImage('./img/finish.png');
-const charRunLeftImage = createImage('./img/charMoveLeft.png');
-const charRunRightImage = createImage('./img/charMoveRight.png');
-const charStandLeftImage = createImage('./img/charStandLeft.png');
-const charStandRightImage = createImage('./img/charStandRight.png');
-
-type Keys = {
-  right: { pressed: boolean };
-  left: { pressed: boolean };
-};
 export class Game {
   private ctx: CanvasRenderingContext2D;
+  private imageAssets: ImageAssets;
   private player: Player;
+  private life: Life;
   private platforms: Platform[];
   private genericObjects: GenericObject[];
+  private finish: Finish;
   private keys: Keys;
   private scrollOffset: number;
   private stagger: number = 0;
+  private mainMenu: MainMenu;
+  private gameOver: GameOver;
+  private youWon: YouWon;
   private canvas: HTMLCanvasElement;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, imageAssets: ImageAssets) {
     this.ctx = canvas.getContext('2d');
     this.canvas = canvas;
+    this.imageAssets = imageAssets;
+    this.mainMenu = new MainMenu(
+      canvas,
+      imageAssets.mainMenu.background,
+      imageAssets.mainMenu.play
+    );
+    this.gameOver = new GameOver(
+      canvas,
+      imageAssets.mainMenu.background,
+      imageAssets.mainMenu.play
+    );
+    this.youWon = new YouWon(
+      canvas,
+      imageAssets.mainMenu.background,
+      imageAssets.mainMenu.play
+    );
     // Movement Keys
     this.keys = {
       right: { pressed: false },
@@ -44,30 +58,41 @@ export class Game {
     // Offset on a x axis from start
     this.scrollOffset = 0;
     // Creating Player
-    this.createPlayer(canvas);
+    this.createPlayer(canvas, imageAssets.character);
     // Creating Platforms
-    this.createPlatforms(canvas);
+    this.createPlatforms(canvas, imageAssets.platform);
     // Creating General Objects
-    this.createGenericObjects(canvas);
-    // // Add event listeners for keyboard input
+    this.createGenericObjects(canvas, imageAssets.background);
+    // Creating Finish Object
+    this.createFinishLine(imageAssets.finish);
+    // Creating Life Objects
+    this.createLives(imageAssets.life);
+    // Event listeners for keyboard input
     this.gameMovement();
   }
-  private createPlayer(canvas: HTMLCanvasElement) {
+
+  private createPlayer(
+    canvas: HTMLCanvasElement,
+    characterAssets: CharacterAssets
+  ) {
     this.player = new Player(
       { x: 50, y: 50 },
       { x: 0, y: 0 },
       {
-        width: charStandRightImage.width,
-        height: charStandRightImage.height,
+        width: characterAssets.characterStandRight.width,
+        height: characterAssets.characterStandRight.height,
       },
       canvas,
-      charStandLeftImage,
-      charStandRightImage,
-      charRunLeftImage,
-      charRunRightImage
+      characterAssets.characterStandLeft,
+      characterAssets.characterStandRight,
+      characterAssets.characterMoveLeft,
+      characterAssets.characterMoveRight
     );
   }
-  private createPlatforms(canvas: HTMLCanvasElement) {
+  private createPlatforms(
+    canvas: HTMLCanvasElement,
+    platformImage: HTMLImageElement
+  ) {
     this.platforms = [];
     // Creating first platfom
     this.platforms.push(
@@ -95,7 +120,10 @@ export class Game {
       );
     }
   }
-  private createGenericObjects(canvas: HTMLCanvasElement) {
+  private createGenericObjects(
+    canvas: HTMLCanvasElement,
+    backgroundImage: HTMLImageElement
+  ) {
     this.genericObjects = [];
 
     for (let i = 0; i < 10; i++) {
@@ -112,14 +140,24 @@ export class Game {
       );
     }
   }
-  private drawFinishLine() {
+  private createFinishLine(finishImage: HTMLImageElement) {
     const lastPlatform = this.platforms[this.platforms.length - 1];
-    this.ctx.drawImage(
-      finishImage,
-      winingLength - this.scrollOffset + 400,
-      lastPlatform.position.y - finishImage.height,
-      finishImage.width,
-      finishImage.height
+    this.finish = new Finish(
+      {
+        x: winingLength - this.scrollOffset + 400,
+        y: lastPlatform.position.y - finishImage.height,
+      },
+      finishImage
+    );
+  }
+  private createLives(lifeImage: HTMLImageElement) {
+    this.life = new Life(
+      {
+        x: this.canvas.width,
+        y: 10,
+      },
+      lifeImage,
+      3
     );
   }
   private gameMovement() {
@@ -172,9 +210,9 @@ export class Game {
     });
   }
   private restart() {
-    this.createPlayer(this.canvas);
-    this.createPlatforms(this.canvas);
-    this.createGenericObjects(this.canvas);
+    this.createPlayer(this.canvas, this.imageAssets.character);
+    this.createPlatforms(this.canvas, this.imageAssets.platform);
+    this.createGenericObjects(this.canvas, this.imageAssets.background);
     this.scrollOffset = 0;
   }
 
@@ -197,7 +235,8 @@ export class Game {
       this.platforms.forEach((platform) => {
         platform.draw(this.ctx);
       });
-    this.drawFinishLine();
+    this.life.draw(this.ctx);
+    this.finish.draw(this.ctx);
   }
 
   private checkForColision() {
@@ -255,17 +294,35 @@ export class Game {
   }
   private gameStatus() {
     // Win condition
-    if (this.scrollOffset > winingLength) console.log('you win');
+    if (this.scrollOffset > winingLength) {
+      this.youWon.setInYouWon();
+      this.restart();
+      this.life.life = 3;
+    }
     // Lose condition and game restart
-    if (this.player.position.y > this.canvas.height) this.restart();
+    if (this.player.position.y > this.canvas.height) {
+      this.life.life--;
+      if (this.life.life <= 0) {
+        this.gameOver.setInGameOver();
+        this.restart();
+        this.life.life = 3;
+      } else {
+        this.restart();
+      }
+    }
   }
   private gameLoop() {
     requestAnimationFrame(() => this.gameLoop());
-    this.draw();
-    this.checkForColision();
-    this.checkMovement();
-    this.gameStatus();
-    this.player.update();
+    if (this.mainMenu.getInMainMenu()) this.mainMenu.drawMainMenu();
+    else if (this.gameOver.getInGameOver()) this.gameOver.drawGameOver();
+    else if (this.youWon.getInYouWon()) this.youWon.drawYouWon();
+    else {
+      this.draw();
+      this.checkForColision();
+      this.checkMovement();
+      this.gameStatus();
+      this.player.update();
+    }
   }
 
   public start() {
