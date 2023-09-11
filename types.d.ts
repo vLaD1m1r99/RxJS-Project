@@ -53,3 +53,11 @@ type ImageAssets = {
   life: HTMLImageElement;
   platform: HTMLImageElement;
 };
+type GameAssets = {
+  gravity: number;
+  playerSpeed: number;
+  playerJump: number;
+  platformSpeed: number;
+  genericObjectSpeed: number;
+  winingLength: number;
+};

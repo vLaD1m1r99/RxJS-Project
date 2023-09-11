@@ -44,9 +44,8 @@ async function initializeAndStartGame() {
   const gameAssets = await fetchGameAssets();
 
   if (gameAssets && imageAssets) {
-    console.log(gameAssets);
     const loadedImageAssets: ImageAssets = await loadImages(imageAssets);
-    const game = new Game(canvas, loadedImageAssets);
+    const game = new Game(canvas, loadedImageAssets, gameAssets);
     game.start();
   } else {
     // Maybe create error html

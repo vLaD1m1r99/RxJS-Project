@@ -1,3 +1,5 @@
+import { fromEvent, merge, from } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { MainMenu } from './mainMenu';
 import { GameOver } from './gameOver';
 import { YouWon } from './youWon';
@@ -5,19 +7,12 @@ import { Player } from './player';
 import { Platform } from './platform';
 import { Finish } from './finish';
 import { Life } from './life';
-import { fromEvent, merge, from } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import { GenericObject } from './genericObject';
-import {
-  genericObjectSpeed,
-  platformSpeed,
-  playerSpeed,
-  winingLength,
-} from './utils';
 
 export class Game {
   private ctx: CanvasRenderingContext2D;
   private imageAssets: ImageAssets;
+  private gameAssets: GameAssets;
   private player: Player;
   private life: Life;
   private platforms: Platform[];
@@ -31,10 +26,15 @@ export class Game {
   private youWon: YouWon;
   private canvas: HTMLCanvasElement;
 
-  constructor(canvas: HTMLCanvasElement, imageAssets: ImageAssets) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    imageAssets: ImageAssets,
+    gameAssets: GameAssets
+  ) {
     this.ctx = canvas.getContext('2d');
     this.canvas = canvas;
     this.imageAssets = imageAssets;
+    this.gameAssets = gameAssets;
     this.mainMenu = new MainMenu(
       canvas,
       imageAssets.mainMenu.background,
@@ -86,7 +86,10 @@ export class Game {
       characterAssets.characterStandLeft,
       characterAssets.characterStandRight,
       characterAssets.characterMoveLeft,
-      characterAssets.characterMoveRight
+      characterAssets.characterMoveRight,
+      this.gameAssets.gravity,
+      this.gameAssets.playerSpeed,
+      this.gameAssets.playerJump
     );
   }
   private createPlatforms(
@@ -107,7 +110,7 @@ export class Game {
     const maxGap = 300;
     let lastX = platformImage.width;
     // Creating all other random platforms
-    while (winingLength > lastX - maxGap) {
+    while (this.gameAssets.winingLength > lastX - maxGap) {
       const x = lastX + Math.random() * (maxGap - minGap) + minGap;
       const y = canvas.height - platformImage.height - Math.random() * 200;
       lastX = x + platformImage.width;
@@ -144,7 +147,7 @@ export class Game {
     const lastPlatform = this.platforms[this.platforms.length - 1];
     this.finish = new Finish(
       {
-        x: winingLength - this.scrollOffset + 400,
+        x: this.gameAssets.winingLength - this.scrollOffset + 400,
         y: lastPlatform.position.y - finishImage.height,
       },
       finishImage
@@ -274,27 +277,27 @@ export class Game {
     } else {
       this.player.stop();
       if (this.keys.right.pressed) {
-        this.scrollOffset += playerSpeed;
+        this.scrollOffset += this.gameAssets.playerSpeed;
         this.platforms.forEach((platform) => {
-          platform.position.x -= platformSpeed;
+          platform.position.x -= this.gameAssets.playerSpeed;
         });
         this.genericObjects.forEach((genericObject) => {
-          genericObject.position.x -= genericObjectSpeed;
+          genericObject.position.x -= this.gameAssets.genericObjectSpeed;
         });
       } else if (this.keys.left.pressed && this.scrollOffset > 0) {
-        this.scrollOffset -= playerSpeed;
+        this.scrollOffset -= this.gameAssets.playerSpeed;
         this.platforms.forEach((platform) => {
-          platform.position.x += platformSpeed;
+          platform.position.x += this.gameAssets.platformSpeed;
         });
         this.genericObjects.forEach((genericObject) => {
-          genericObject.position.x += genericObjectSpeed;
+          genericObject.position.x += this.gameAssets.genericObjectSpeed;
         });
       }
     }
   }
   private gameStatus() {
     // Win condition
-    if (this.scrollOffset > winingLength) {
+    if (this.scrollOffset > this.gameAssets.winingLength) {
       this.youWon.setInYouWon();
       this.restart();
       this.life.life = 3;

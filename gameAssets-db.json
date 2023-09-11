@@ -15,5 +15,12 @@
     "life": "heart.png",
     "platform": "platform.png"
   },
-  "gameAssets": {}
+  "gameAssets": {
+    "gravity": 0.5,
+    "playerSpeed": 5,
+    "playerJump": 15,
+    "platformSpeed": 5,
+    "genericObjectSpeed": 3,
+    "winingLength": 10000
+  }
 }

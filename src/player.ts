@@ -1,4 +1,3 @@
-import { gravity, playerSpeed, playerJump } from './utils';
 export class Player {
   public position: Vector2;
   public velocity: Vector2;
@@ -8,6 +7,9 @@ export class Player {
   public currentFrame: number;
   public currentSprite: HTMLImageElement;
   public canJump: boolean;
+  public gravity: number;
+  public playerSpeed: number;
+  public playerJump: number;
 
   constructor(
     position: Vector2,
@@ -17,11 +19,17 @@ export class Player {
     imgStandLeft: HTMLImageElement,
     imgStandRight: HTMLImageElement,
     imgRunLeft: HTMLImageElement,
-    imgRunRight: HTMLImageElement
+    imgRunRight: HTMLImageElement,
+    gravity: number,
+    playerSpeed: number,
+    playerJump: number
   ) {
     this.position = position;
     this.velocity = velocity;
     this.size = size;
+    this.gravity = gravity;
+    this.playerSpeed = playerSpeed;
+    this.playerJump = playerJump;
     this.canvas = canvas;
     this.sprites = {
       stand: {
@@ -76,19 +84,19 @@ export class Player {
       this.position.y + this.size.height + this.velocity.y <=
       this.canvas.height
     )
-      this.velocity.y += gravity;
+      this.velocity.y += this.gravity;
     this.draw(this.canvas.getContext('2d'));
   }
   moveLeft() {
-    this.velocity.x = -playerSpeed;
+    this.velocity.x = -this.playerSpeed;
   }
   moveRight() {
-    this.velocity.x = +playerSpeed;
+    this.velocity.x = +this.playerSpeed;
   }
   stop() {
     this.velocity.x = 0;
   }
   jump() {
-    if (this.canJump === true) this.velocity.y = -playerJump;
+    if (this.canJump === true) this.velocity.y = -this.playerJump;
   }
 }
