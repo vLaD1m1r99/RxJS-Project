@@ -1,32 +1,5 @@
 import { Game } from './game';
-import { loadImages } from './utils';
-
-async function fetchImageAssets() {
-  try {
-    const response = await fetch('http://localhost:3000/imageAssets');
-    if (!response.ok) {
-      throw new Error('Failed to fetch image assets');
-    }
-    const assets = await response.json();
-    return assets;
-  } catch (error) {
-    console.error('Error fetching image assets', error);
-    return null;
-  }
-}
-async function fetchGameAssets() {
-  try {
-    const response = await fetch('http://localhost:3000/gameAssets');
-    if (!response.ok) {
-      throw new Error('Failed to fetch game assets');
-    }
-    const assets = await response.json();
-    return assets;
-  } catch (error) {
-    console.error('Error fetching game assets', error);
-    return null;
-  }
-}
+import { loadImages, fetchImageAssets, fetchGameAssets } from './utils';
 
 async function initializeAndStartGame() {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -48,7 +21,6 @@ async function initializeAndStartGame() {
     const game = new Game(canvas, loadedImageAssets, gameAssets);
     game.start();
   } else {
-    // Maybe create error html
     console.error('Failed to fetch game assets. The game cannot start.');
   }
 }

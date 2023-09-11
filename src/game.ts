@@ -1,14 +1,24 @@
-import { fromEvent, merge, from } from 'rxjs';
+import {
+  fromEvent,
+  merge,
+  from,
+  Observable,
+  combineLatest,
+  of,
+  take,
+  tap,
+} from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { MainMenu } from './mainMenu';
-import { GameOver } from './gameOver';
-import { YouWon } from './youWon';
-import { Player } from './player';
-import { Platform } from './platform';
-import { Finish } from './finish';
-import { Life } from './life';
-import { GenericObject } from './genericObject';
-
+import {
+  MainMenu,
+  GameOver,
+  YouWon,
+  Player,
+  Platform,
+  Finish,
+  Life,
+  GenericObject,
+} from './exports';
 export class Game {
   private ctx: CanvasRenderingContext2D;
   private imageAssets: ImageAssets;
@@ -144,7 +154,6 @@ export class Game {
     }
   }
   private createFinishLine(finishImage: HTMLImageElement) {
-    const lastPlatform = this.platforms[this.platforms.length - 1];
     this.finish = new Finish(finishImage);
   }
   private createLives(lifeImage: HTMLImageElement) {
@@ -216,29 +225,50 @@ export class Game {
   private draw() {
     // Drawing the game
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    if (this.genericObjects)
-      this.genericObjects.forEach((genericObject) => {
-        genericObject.draw(this.ctx);
-      });
-    if (this.player) {
-      if (this.stagger >= 15) {
-        this.player.currentFrame++;
-        this.stagger = 0;
-      }
-      this.player.draw(this.ctx);
-    }
-    this.stagger++;
-    if (this.platforms)
-      this.platforms.forEach((platform) => {
-        platform.draw(this.ctx);
-      });
-    this.life.draw(this.ctx);
-    this.finish.draw(this.ctx, {
-      x: this.gameAssets.winingLength - this.scrollOffset + 400,
-      y:
-        this.platforms[this.platforms.length - 1].position.y -
-        this.finish.image.height,
-    });
+
+    // Define observables for each element to draw
+    const drawPlayer$ = of(this.player).pipe(
+      filter((player) => player !== null),
+      take(1)
+    );
+
+    const drawGenericObjects$ = from(this.genericObjects || []);
+    const drawPlatforms$ = from(this.platforms || []);
+
+    // Combine all observables to draw elements in parallel
+    combineLatest([drawPlayer$, drawGenericObjects$, drawPlatforms$])
+      .pipe(
+        tap(([player, genericObjects, platforms]) => {
+          // Draw player
+          if (this.stagger >= 15) {
+            player.currentFrame++;
+            this.stagger = 0;
+          }
+          player.draw(this.ctx);
+
+          // Draw generic objects
+          this.genericObjects.forEach((genericObject) => {
+            genericObject.draw(this.ctx);
+          });
+
+          // Draw platforms
+          this.platforms.forEach((platform) => {
+            platform.draw(this.ctx);
+          });
+
+          // Draw other elements like life and finish
+          this.life.draw(this.ctx);
+          this.finish.draw(this.ctx, {
+            x: this.gameAssets.winingLength - this.scrollOffset + 400,
+            y:
+              this.platforms[this.platforms.length - 1].position.y -
+              this.finish.image.height,
+          });
+
+          this.stagger++;
+        })
+      )
+      .subscribe(() => {});
   }
 
   private checkForColision() {
@@ -295,24 +325,31 @@ export class Game {
     }
   }
   private gameStatus() {
-    // Win condition
-    if (this.scrollOffset > this.gameAssets.winingLength) {
-      this.youWon.setInYouWon();
-      this.restart();
-      this.life.life = 3;
-    }
-    // Lose condition and game restart
-    if (this.player.position.y > this.canvas.height) {
-      this.life.life--;
-      if (this.life.life <= 0) {
-        this.gameOver.setInGameOver();
+    const winConditionObservable = new Observable<void>((observer) => {
+      if (this.scrollOffset > this.gameAssets.winingLength) {
+        this.youWon.setInYouWon();
         this.restart();
         this.life.life = 3;
-      } else {
-        this.restart();
+        observer.next();
       }
-    }
+    });
+    const loseConditionObservable = new Observable<void>((observer) => {
+      if (this.player.position.y > this.canvas.height) {
+        this.life.life--;
+        if (this.life.life <= 0) {
+          this.gameOver.setInGameOver();
+          this.restart();
+          this.life.life = 3;
+          observer.next();
+        } else {
+          this.restart();
+          observer.next();
+        }
+      }
+    });
+    merge(winConditionObservable, loseConditionObservable).subscribe();
   }
+
   private gameLoop() {
     requestAnimationFrame(() => this.gameLoop());
     if (this.mainMenu.getInMainMenu()) this.mainMenu.drawMainMenu();

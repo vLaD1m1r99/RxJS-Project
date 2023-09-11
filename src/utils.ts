@@ -28,3 +28,29 @@ export async function loadImages(assets: any) {
 
   return data;
 }
+export async function fetchImageAssets() {
+  try {
+    const response = await fetch('http://localhost:3000/imageAssets');
+    if (!response.ok) {
+      throw new Error('Failed to fetch image assets');
+    }
+    const assets = await response.json();
+    return assets;
+  } catch (error) {
+    console.error('Error fetching image assets', error);
+    return null;
+  }
+}
+export async function fetchGameAssets() {
+  try {
+    const response = await fetch('http://localhost:3000/gameAssets');
+    if (!response.ok) {
+      throw new Error('Failed to fetch game assets');
+    }
+    const assets = await response.json();
+    return assets;
+  } catch (error) {
+    console.error('Error fetching game assets', error);
+    return null;
+  }
+}
