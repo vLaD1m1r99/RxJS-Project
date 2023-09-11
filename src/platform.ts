@@ -1,6 +1,6 @@
 export class Platform {
-  public position: Vector2;
-  public size: Size;
+  position: Vector2;
+  size: Size;
   image: HTMLImageElement;
 
   constructor(position: Vector2, size: Size, image: HTMLImageElement) {
@@ -9,7 +9,7 @@ export class Platform {
     this.image = image;
   }
 
-  public draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.drawImage(
       this.image,
       this.position.x,

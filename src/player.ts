@@ -1,15 +1,15 @@
 export class Player {
-  public position: Vector2;
-  public velocity: Vector2;
-  public size: Size;
-  public canvas: HTMLCanvasElement;
-  public sprites: Sprites;
-  public currentFrame: number;
-  public currentSprite: HTMLImageElement;
-  public canJump: boolean;
-  public gravity: number;
-  public playerSpeed: number;
-  public playerJump: number;
+  position: Vector2;
+  velocity: Vector2;
+  size: Size;
+  canvas: HTMLCanvasElement;
+  sprites: Sprites;
+  currentFrame: number;
+  currentSprite: HTMLImageElement;
+  canJump: boolean;
+  gravity: number;
+  playerSpeed: number;
+  playerJump: number;
 
   constructor(
     position: Vector2,

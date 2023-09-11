@@ -5,7 +5,7 @@ export class Finish {
     this.image = image;
   }
 
-  public draw(ctx: CanvasRenderingContext2D, position: Vector2) {
+  draw(ctx: CanvasRenderingContext2D, position: Vector2) {
     ctx.drawImage(
       this.image,
       position.x,

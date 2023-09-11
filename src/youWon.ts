@@ -52,7 +52,7 @@ export class YouWon {
     this.drawYouWon();
   }
   // Draw bg
-  public drawYouWon() {
+  drawYouWon() {
     this.ctx.drawImage(
       this.bgImage,
       0,
@@ -113,10 +113,10 @@ export class YouWon {
     }
   }
 
-  public setInYouWon = () => {
+  setInYouWon = () => {
     this.inYouWon = true;
   };
-  public getInYouWon = () => {
+  getInYouWon = () => {
     return this.inYouWon;
   };
 }

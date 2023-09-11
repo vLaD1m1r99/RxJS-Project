@@ -9,7 +9,7 @@ export class Life {
     this.image = image;
   }
 
-  public draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     const heartWidth = 30;
     const heartHeight = 30;
     const heartSpacing = 10;

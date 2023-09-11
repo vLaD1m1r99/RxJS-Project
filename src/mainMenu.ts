@@ -52,7 +52,7 @@ export class MainMenu {
     this.drawMainMenu();
   }
   // Draw bg
-  public drawMainMenu() {
+  drawMainMenu() {
     this.ctx.drawImage(
       this.bgImage,
       0,
@@ -113,7 +113,7 @@ export class MainMenu {
     }
   }
 
-  public getInMainMenu = () => {
+  getInMainMenu = () => {
     return this.inMainMenu;
   };
 }

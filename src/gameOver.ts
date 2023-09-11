@@ -52,7 +52,7 @@ export class GameOver {
     this.drawGameOver();
   }
   // Draw bg
-  public drawGameOver() {
+  drawGameOver() {
     this.ctx.drawImage(
       this.bgImage,
       0,
@@ -113,10 +113,10 @@ export class GameOver {
     }
   }
 
-  public setInGameOver = () => {
+  setInGameOver = () => {
     this.inGameOver = true;
   };
-  public getInGameOver = () => {
+  getInGameOver = () => {
     return this.inGameOver;
   };
 }
