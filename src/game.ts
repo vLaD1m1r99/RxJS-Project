@@ -145,13 +145,7 @@ export class Game {
   }
   private createFinishLine(finishImage: HTMLImageElement) {
     const lastPlatform = this.platforms[this.platforms.length - 1];
-    this.finish = new Finish(
-      {
-        x: this.gameAssets.winingLength - this.scrollOffset + 400,
-        y: lastPlatform.position.y - finishImage.height,
-      },
-      finishImage
-    );
+    this.finish = new Finish(finishImage);
   }
   private createLives(lifeImage: HTMLImageElement) {
     this.life = new Life(
@@ -239,7 +233,12 @@ export class Game {
         platform.draw(this.ctx);
       });
     this.life.draw(this.ctx);
-    this.finish.draw(this.ctx);
+    this.finish.draw(this.ctx, {
+      x: this.gameAssets.winingLength - this.scrollOffset + 400,
+      y:
+        this.platforms[this.platforms.length - 1].position.y -
+        this.finish.image.height,
+    });
   }
 
   private checkForColision() {

@@ -21,6 +21,6 @@
     "playerJump": 15,
     "platformSpeed": 5,
     "genericObjectSpeed": 3,
-    "winingLength": 10000
+    "winingLength": 11000
   }
 }

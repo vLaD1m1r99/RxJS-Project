@@ -1,17 +1,15 @@
 export class Finish {
-  position: Vector2;
   image: HTMLImageElement;
 
-  constructor(position: Vector2, image: HTMLImageElement) {
-    this.position = position;
+  constructor(image: HTMLImageElement) {
     this.image = image;
   }
 
-  public draw(ctx: CanvasRenderingContext2D) {
+  public draw(ctx: CanvasRenderingContext2D, position: Vector2) {
     ctx.drawImage(
       this.image,
-      this.position.x,
-      this.position.y,
+      position.x,
+      position.y,
       this.image.width,
       this.image.height
     );
