@@ -226,7 +226,6 @@ export class Game {
     // Drawing the game
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-    // Define observables for each element to draw
     const drawPlayer$ = of(this.player).pipe(
       filter((player) => player !== null),
       take(1)
@@ -235,28 +234,23 @@ export class Game {
     const drawGenericObjects$ = from(this.genericObjects || []);
     const drawPlatforms$ = from(this.platforms || []);
 
-    // Combine all observables to draw elements in parallel
     combineLatest([drawPlayer$, drawGenericObjects$, drawPlatforms$])
       .pipe(
-        tap(([player, genericObjects, platforms]) => {
-          // Draw player
+        tap(() => {
           if (this.stagger >= 15) {
-            player.currentFrame++;
+            this.player.currentFrame++;
             this.stagger = 0;
           }
-          player.draw(this.ctx);
+          this.player.draw(this.ctx);
 
-          // Draw generic objects
           this.genericObjects.forEach((genericObject) => {
             genericObject.draw(this.ctx);
           });
 
-          // Draw platforms
           this.platforms.forEach((platform) => {
             platform.draw(this.ctx);
           });
 
-          // Draw other elements like life and finish
           this.life.draw(this.ctx);
           this.finish.draw(this.ctx, {
             x: this.gameAssets.winingLength - this.scrollOffset + 400,
